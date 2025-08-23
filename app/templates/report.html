@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Cultos - {{ month }} {{ year }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 1cm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 11px;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 210mm;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .igreja-nome {
+            font-size: 12px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+        }
+
+        hr {
+            border: none;
+            border-top: 2px solid #34495e;
+            margin: 10px 0;
+        }
+
+        .escala-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+            background-color: white;
+        }
+
+        .escala-table th {
+            background-color: #34495e;
+            color: white;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid #2c3e50;
+            font-size: 10px;
+        }
+
+        .escala-table td {
+            padding: 6px;
+            border: 1px solid #bdc3c7;
+            text-align: center;
+            font-size: 10px;
+            vertical-align: middle;
+        }
+
+        /* Cores para diferentes tipos de culto */
+        .familia-row {
+            background-color: #fff2cc;
+        }
+
+        .oracao-row {
+            background-color: #e8f5e8;
+        }
+
+        .jovens-row {
+            background-color: #e3f2fd;
+        }
+
+        .default-row {
+            background-color: #f8f9fa;
+        }
+
+        /* Hover effect para linhas */
+        .escala-table tr:nth-child(even):not(.familia-row):not(.oracao-row):not(.jovens-row) {
+            background-color: #f1f2f6;
+        }
+
+        footer {
+            margin-top: 30px;
+            border-top: 1px solid #bdc3c7;
+            padding-top: 15px;
+        }
+
+        .legenda {
+            margin-bottom: 15px;
+        }
+
+        .legenda p {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .legenda-item {
+            display: inline-block;
+            padding: 3px 8px;
+            margin-right: 10px;
+            border-radius: 3px;
+            font-size: 9px;
+            border: 1px solid #ddd;
+        }
+
+        .legenda-item.oracao {
+            background-color: #e8f5e8;
+        }
+
+        .legenda-item.jovens {
+            background-color: #e3f2fd;
+        }
+
+        .legenda-item.familia {
+            background-color: #fff2cc;
+        }
+
+        .info {
+            text-align: center;
+            font-size: 9px;
+            color: #7f8c8d;
+        }
+
+        .info p {
+            margin-bottom: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Escala de Cultos - {{ month }} {{ year }}</h1>
+            <p class="igreja-nome">{{ igreja_nome }}</p>
+            <hr>
+        </header>
+        
+        <main>
+            <table class="escala-table">
+                <thead>
+                    <tr>
+                        <th>Data</th>
+                        <th>Tipo de Culto</th>
+                        <th>Pregador</th>
+                        <th>Dirigente</th>
+                        <th>Louvor</th>
+                        <th>Instrumentistas</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr class="{{ event.row_class }}">
+                        <td>{{ event.date }}</td>
+                        <td>{{ event.tipo_culto }}</td>
+                        <td>{{ event.pregador }}</td>
+                        <td>{{ event.dirigente }}</td>
+                        <td>{{ event.louvor }}</td>
+                        <td>{{ event.instrumentistas }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </main>
+        
+        <footer>
+            <div class="legenda">
+                <p><strong>Legenda:</strong></p>
+                <span class="legenda-item oracao">Oração</span>
+                <span class="legenda-item jovens">Jovens</span>
+                <span class="legenda-item familia">Família</span>
+            </div>
+            
+            <div class="info">
+                <p>Documento gerado em {{ generated_date }}</p>
+                <p><strong>Total de eventos programados:</strong> {{ total_events }}</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
