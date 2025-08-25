@@ -1,28 +1,30 @@
-FROM ubuntu:22.04
+FROM python:3.11-slim
 
-# Evitar prompts durante instalação
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Instalar Python e dependências
+# Instalar dependências do sistema
 RUN apt-get update && apt-get install -y \
-    python3.11 \
-    python3.11-pip \
-    python3.11-venv \
-    wkhtmltopdf \
-    libjpeg8 \
+    wget \
+    fontconfig \
     libxrender1 \
     libxext6 \
     libfontconfig1 \
-    fontconfig \
+    libjpeg62-turbo \
+    libpng16-16 \
+    libssl3 \
+    xfonts-75dpi \
+    xfonts-base \
  && rm -rf /var/lib/apt/lists/*
 
-# Criar link simbólico para python
-RUN ln -s /usr/bin/python3.11 /usr/bin/python
+# Instalar wkhtmltopdf manualmente
+RUN wget -q https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.bullseye_amd64.deb \
+    && dpkg -i wkhtmltox_0.12.6.1-3.bullseye_amd64.deb || true \
+    && apt-get update \
+    && apt-get install -f -y \
+    && rm wkhtmltox_0.12.6.1-3.bullseye_amd64.deb
 
 WORKDIR /app
 COPY requirements.txt .
-RUN python -m pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
