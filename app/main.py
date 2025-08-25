@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.responses import Response
+import io
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.responses import Response, StreamingResponse
 from .pdf_generator import PDFGenerator
 import logging
 
@@ -56,6 +57,45 @@ async def generate_report(request: dict):
             status_code=500, 
             detail=f"Erro ao gerar relatório: {str(e)}"
         )
+
+
+@app.post("/generate-report-image")
+async def generate_report_image(request: dict, fmt: str = Query("png")):
+    """
+    Recebe o MESMO JSON do /generate-report e retorna imagem (png/jpg).
+    Exemplo de uso:
+    POST /generate-report-image?fmt=jpg
+    Body:
+    {
+      "year": "2025",
+      "month": "6",
+      "igreja_nome": "...",
+      "events": [ ... ]
+    }
+    """
+    try:
+        if not isinstance(request, dict):
+            raise ValueError("Request deve ser um objeto JSON")
+
+        if 'events' not in request or not isinstance(request['events'], list):
+            raise ValueError("Campo 'events' é obrigatório e deve ser uma lista")
+
+        year = request.get('year', '2025')
+        month = str(request.get('month', '1'))
+        filename = f"escala_cultos_{year}_{month.zfill(2)}.{fmt}"
+
+        img_bytes = pdf_generator.generate_image(request, image_format=fmt)
+
+        return StreamingResponse(
+            io.BytesIO(img_bytes),
+            media_type=f"image/{'jpeg' if fmt in ('jpg', 'jpeg') else fmt}",
+            headers={"Content-Disposition": f"inline; filename={filename}"}
+        )
+
+    except Exception as e:
+        logger.error(f"Erro ao gerar imagem: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Erro ao gerar imagem: {str(e)}")
+
 
 @app.get("/health")
 async def health_check():
