@@ -1,5 +1,5 @@
-# Usar uma imagem base do Python
-FROM python:3.11-slim
+# Usar imagem baseada no Debian Bookworm (12), onde o wkhtmltopdf ainda existe
+FROM python:3.11-slim-bookworm
 
 # Instalar dependências do sistema e o wkhtmltopdf
 RUN apt-get update && apt-get install -y \
@@ -19,7 +19,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copiar restante do código
 COPY . .
 
-# Variável padrão para produção (pode ser sobrescrita no Coolify)
+# Variável padrão para produção (sobrescrevível no Coolify)
 ENV WKHTMLTOPDF_PATH=/usr/bin/wkhtmltopdf
 
 # Expor porta
