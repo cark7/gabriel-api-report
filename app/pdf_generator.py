@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 # Carregar variáveis do .env (se existir)
 load_dotenv()
 
+
 class PDFGenerator:
     def __init__(self):
         template_dir = os.path.join(os.path.dirname(__file__), "templates")
@@ -17,6 +18,11 @@ class PDFGenerator:
 
         # Detectar wkhtmltopdf no Windows via .env
         wkhtml_path = os.environ.get("WKHTMLTOPDF_PATH")
+
+        if not wkhtml_path:  
+            # tenta default Linux
+            wkhtml_path = "/usr/bin/wkhtmltopdf"
+
         self.config = None
         if wkhtml_path and os.path.exists(wkhtml_path):
             self.config = pdfkit.configuration(wkhtmltopdf=wkhtml_path)
